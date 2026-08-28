@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "954611738817",
+    "project_id": "tactimind-2e5e5",
+    "storage_bucket": "tactimind-2e5e5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:954611738817:android:ce4e50b9a8341469828c40",
+        "android_client_info": {
+          "package_name": "com.example.tactimind"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-byMn_fKRdQWKbfcyATrl99oxH7n1_uw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
