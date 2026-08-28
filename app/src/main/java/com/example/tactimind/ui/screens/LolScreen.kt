@@ -1,29 +1,17 @@
 package com.example.tactimind.ui.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.example.tactimind.viewmodel.TipViewModel
 
 @Composable
-fun LolScreen(onBackClick: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("League of Legends savjeti")
-
-        Button(onClick = onBackClick) {
-            Text("Natrag")
-        }
-    }
+fun LolScreen(
+    tipViewModel: TipViewModel,
+    onBackClick: () -> Unit
+) {
+    TipScreen(
+        game = "LOL",
+        screenTitle = "League of Legends savjeti",
+        tipViewModel = tipViewModel,
+        onBackClick = onBackClick
+    )
 }

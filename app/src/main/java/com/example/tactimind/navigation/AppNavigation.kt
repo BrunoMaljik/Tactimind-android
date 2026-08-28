@@ -12,6 +12,7 @@ import com.example.tactimind.ui.screens.LolScreen
 import com.example.tactimind.ui.screens.RegisterScreen
 import com.example.tactimind.ui.screens.TftScreen
 import com.example.tactimind.viewmodel.AuthViewModel
+import com.example.tactimind.viewmodel.TipViewModel
 
 private object Routes {
     const val LOGIN = "login"
@@ -23,7 +24,8 @@ private object Routes {
 
 @Composable
 fun AppNavigation(
-    authViewModel: AuthViewModel = viewModel()
+    authViewModel: AuthViewModel = viewModel(),
+    tipViewModel: TipViewModel = viewModel()
 ) {
     val navController = rememberNavController()
 
@@ -105,6 +107,7 @@ fun AppNavigation(
 
         composable(Routes.LOL) {
             LolScreen(
+                tipViewModel = tipViewModel,
                 onBackClick = {
                     navController.popBackStack()
                 }
@@ -113,6 +116,7 @@ fun AppNavigation(
 
         composable(Routes.TFT) {
             TftScreen(
+                tipViewModel = tipViewModel,
                 onBackClick = {
                     navController.popBackStack()
                 }
