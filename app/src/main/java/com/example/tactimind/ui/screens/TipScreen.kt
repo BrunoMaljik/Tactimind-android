@@ -1,5 +1,6 @@
 package com.example.tactimind.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,13 +10,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -27,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.tactimind.model.Tip
 import com.example.tactimind.viewmodel.TipViewModel
@@ -38,21 +43,10 @@ fun TipScreen(
     tipViewModel: TipViewModel,
     onBackClick: () -> Unit
 ) {
-    var showAddDialog by remember {
-        mutableStateOf(false)
-    }
-
-    var editingTip by remember {
-        mutableStateOf<Tip?>(null)
-    }
-
-    var deletingTip by remember {
-        mutableStateOf<Tip?>(null)
-    }
-
-    var randomTip by remember {
-        mutableStateOf<Tip?>(null)
-    }
+    var showAddDialog by remember { mutableStateOf(false) }
+    var editingTip by remember { mutableStateOf<Tip?>(null) }
+    var deletingTip by remember { mutableStateOf<Tip?>(null) }
+    var randomTip by remember { mutableStateOf<Tip?>(null) }
 
     LaunchedEffect(game) {
         tipViewModel.loadTips(game)
@@ -68,61 +62,59 @@ fun TipScreen(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(
-                onClick = onBackClick
-            ) {
-                Text("Natrag")
+            TextButton(onClick = onBackClick) {
+                Text("← Natrag")
             }
 
-            Spacer(
-                modifier = Modifier.weight(1f)
-            )
+            Spacer(modifier = Modifier.weight(1f))
 
             Button(
                 onClick = {
                     tipViewModel.clearError()
                     showAddDialog = true
-                }
+                },
+                shape = RoundedCornerShape(14.dp)
             ) {
-                Text("Dodaj savjet")
+                Text("+ Dodaj savjet")
             }
         }
 
-        Spacer(
-            modifier = Modifier.height(16.dp)
-        )
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = screenTitle,
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold
         )
 
-        Spacer(
-            modifier = Modifier.height(8.dp)
-        )
+        Spacer(modifier = Modifier.height(6.dp))
 
         Text(
             text = "Ukupno savjeta: ${tipViewModel.tips.size}",
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.tertiary
         )
 
-        Spacer(
-            modifier = Modifier.height(16.dp)
-        )
+        Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
+        OutlinedButton(
             onClick = {
                 randomTip = tipViewModel.tips.random()
             },
             enabled = tipViewModel.tips.isNotEmpty(),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            shape = RoundedCornerShape(16.dp),
+            border = BorderStroke(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.75f)
+            )
         ) {
-            Text("Prikaži nasumični savjet")
+            Text("✦ Prikaži nasumični savjet")
         }
 
-        Spacer(
-            modifier = Modifier.height(16.dp)
-        )
+        Spacer(modifier = Modifier.height(16.dp))
 
         tipViewModel.errorMessage?.let { message ->
             Text(
@@ -130,54 +122,68 @@ fun TipScreen(
                 color = MaterialTheme.colorScheme.error
             )
 
-            Spacer(
-                modifier = Modifier.height(12.dp)
-            )
+            Spacer(modifier = Modifier.height(12.dp))
         }
 
         if (tipViewModel.isLoading) {
             CircularProgressIndicator(
-                modifier = Modifier.align(
-                    Alignment.CenterHorizontally
-                )
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         } else if (tipViewModel.tips.isEmpty()) {
-            Text("Još nema savjeta.")
+            Text(
+                text = "Još nema savjeta.",
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.75f)
+            )
         } else {
             LazyColumn(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(
                     items = tipViewModel.tips,
-                    key = { tip ->
-                        tip.id
-                    }
+                    key = { tip -> tip.id }
                 ) { tip ->
                     Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(18.dp),
+                        border = BorderStroke(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.primary.copy(
+                                alpha = 0.45f
+                            )
+                        ),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surface.copy(
+                                alpha = 0.90f
+                            )
+                        ),
+                        elevation = CardDefaults.cardElevation(
+                            defaultElevation = 6.dp
+                        )
                     ) {
                         Column(
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier.padding(18.dp)
                         ) {
                             Text(
                                 text = tip.title,
-                                style = MaterialTheme.typography.titleMedium
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
                             )
 
-                            Spacer(
-                                modifier = Modifier.height(8.dp)
-                            )
+                            Spacer(modifier = Modifier.height(8.dp))
 
                             Text(
-                                text = tip.description
+                                text = tip.description,
+                                color = MaterialTheme.colorScheme.onSurface.copy(
+                                    alpha = 0.90f
+                                )
                             )
 
                             if (tipViewModel.canEditTip(tip)) {
                                 Row(
-                                    horizontalArrangement = Arrangement.End,
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.End
                                 ) {
                                     TextButton(
                                         onClick = {
@@ -194,7 +200,10 @@ fun TipScreen(
                                             deletingTip = tip
                                         }
                                     ) {
-                                        Text("Obriši")
+                                        Text(
+                                            text = "Obriši",
+                                            color = MaterialTheme.colorScheme.error
+                                        )
                                     }
                                 }
                             }
@@ -260,9 +269,7 @@ fun TipScreen(
                 Text("Obrisati savjet?")
             },
             text = {
-                Text(
-                    "Jesi li siguran da želiš obrisati „${tip.title}”?"
-                )
+                Text("Jesi li siguran da želiš obrisati „${tip.title}”?")
             },
             confirmButton = {
                 TextButton(
@@ -271,7 +278,10 @@ fun TipScreen(
                         deletingTip = null
                     }
                 ) {
-                    Text("Obriši")
+                    Text(
+                        text = "Obriši",
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
             },
             dismissButton = {
@@ -351,9 +361,7 @@ private fun TipDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(
-                    modifier = Modifier.height(12.dp)
-                )
+                Spacer(modifier = Modifier.height(12.dp))
 
                 OutlinedTextField(
                     value = description,
@@ -367,9 +375,7 @@ private fun TipDialog(
                 )
 
                 errorMessage?.let { message ->
-                    Spacer(
-                        modifier = Modifier.height(12.dp)
-                    )
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
                         text = message,
