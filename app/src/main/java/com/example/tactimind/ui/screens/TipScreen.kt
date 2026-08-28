@@ -37,9 +37,17 @@ fun TipScreen(
     tipViewModel: TipViewModel,
     onBackClick: () -> Unit
 ) {
-    var showAddDialog by remember { mutableStateOf(false) }
-    var editingTip by remember { mutableStateOf<Tip?>(null) }
-    var deletingTip by remember { mutableStateOf<Tip?>(null) }
+    var showAddDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var editingTip by remember {
+        mutableStateOf<Tip?>(null)
+    }
+
+    var deletingTip by remember {
+        mutableStateOf<Tip?>(null)
+    }
 
     LaunchedEffect(game) {
         tipViewModel.loadTips(game)
@@ -54,11 +62,15 @@ fun TipScreen(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(onClick = onBackClick) {
+            Button(
+                onClick = onBackClick
+            ) {
                 Text("Natrag")
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(
+                modifier = Modifier.weight(1f)
+            )
 
             Button(
                 onClick = {
@@ -70,27 +82,35 @@ fun TipScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(
+            modifier = Modifier.height(16.dp)
+        )
 
         Text(
             text = screenTitle,
             style = MaterialTheme.typography.headlineSmall
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(
+            modifier = Modifier.height(16.dp)
+        )
 
-        tipViewModel.errorMessage?.let {
+        tipViewModel.errorMessage?.let { message ->
             Text(
-                text = it,
+                text = message,
                 color = MaterialTheme.colorScheme.error
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(
+                modifier = Modifier.height(12.dp)
+            )
         }
 
         if (tipViewModel.isLoading) {
             CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier.align(
+                    Alignment.CenterHorizontally
+                )
             )
         } else if (tipViewModel.tips.isEmpty()) {
             Text("Još nema savjeta.")
@@ -100,7 +120,9 @@ fun TipScreen(
             ) {
                 items(
                     items = tipViewModel.tips,
-                    key = { tip -> tip.id }
+                    key = { tip ->
+                        tip.id
+                    }
                 ) { tip ->
                     Card(
                         modifier = Modifier
@@ -115,9 +137,13 @@ fun TipScreen(
                                 style = MaterialTheme.typography.titleMedium
                             )
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(
+                                modifier = Modifier.height(8.dp)
+                            )
 
-                            Text(text = tip.description)
+                            Text(
+                                text = tip.description
+                            )
 
                             if (tipViewModel.canEditTip(tip)) {
                                 Row(
@@ -205,7 +231,9 @@ fun TipScreen(
                 Text("Obrisati savjet?")
             },
             text = {
-                Text("Jesi li siguran da želiš obrisati „${tip.title}”?")
+                Text(
+                    "Jesi li siguran da želiš obrisati „${tip.title}”?"
+                )
             },
             confirmButton = {
                 TextButton(
@@ -261,26 +289,38 @@ private fun TipDialog(
             Column {
                 OutlinedTextField(
                     value = title,
-                    onValueChange = { title = it },
-                    label = { Text("Naslov") },
+                    onValueChange = {
+                        title = it
+                    },
+                    label = {
+                        Text("Naslov")
+                    },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(
+                    modifier = Modifier.height(12.dp)
+                )
 
                 OutlinedTextField(
                     value = description,
-                    onValueChange = { description = it },
-                    label = { Text("Opis") },
+                    onValueChange = {
+                        description = it
+                    },
+                    label = {
+                        Text("Opis")
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                errorMessage?.let {
-                    Spacer(modifier = Modifier.height(12.dp))
+                errorMessage?.let { message ->
+                    Spacer(
+                        modifier = Modifier.height(12.dp)
+                    )
 
                     Text(
-                        text = it,
+                        text = message,
                         color = MaterialTheme.colorScheme.error
                     )
                 }
