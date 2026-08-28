@@ -98,6 +98,15 @@ fun TipScreen(
         )
 
         Spacer(
+            modifier = Modifier.height(8.dp)
+        )
+
+        Text(
+            text = "Ukupno savjeta: ${tipViewModel.tips.size}",
+            style = MaterialTheme.typography.bodyMedium
+        )
+
+        Spacer(
             modifier = Modifier.height(16.dp)
         )
 
