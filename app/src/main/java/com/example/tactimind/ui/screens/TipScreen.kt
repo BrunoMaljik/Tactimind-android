@@ -1,5 +1,6 @@
 package com.example.tactimind.ui.screens
 
+import com.example.tactimind.ui.components.ShakeDetector
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -67,6 +68,12 @@ fun TipScreen(
                 tip.category == selectedCategory
             }
         }
+
+    ShakeDetector {
+        if (filteredTips.isNotEmpty() && randomTip == null) {
+            randomTip = filteredTips.random()
+        }
+    }
 
     LaunchedEffect(game) {
         tipViewModel.loadTips(game)
@@ -143,6 +150,15 @@ fun TipScreen(
         ) {
             Text("✦ Prikaži nasumični savjet")
         }
+
+        Text(
+            text = "Ili protresi mobitel za nasumični savjet",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.65f),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 6.dp)
+        )
 
         Spacer(modifier = Modifier.height(14.dp))
 
