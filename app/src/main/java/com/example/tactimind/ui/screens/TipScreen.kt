@@ -10,14 +10,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -43,10 +45,28 @@ fun TipScreen(
     tipViewModel: TipViewModel,
     onBackClick: () -> Unit
 ) {
+    val categories = remember(game) {
+        if (game.equals("TFT", ignoreCase = true)) {
+            listOf("Ekonomija", "Compovi", "Itemi")
+        } else {
+            listOf("Laning", "Buildovi", "Općenito")
+        }
+    }
+
     var showAddDialog by remember { mutableStateOf(false) }
     var editingTip by remember { mutableStateOf<Tip?>(null) }
     var deletingTip by remember { mutableStateOf<Tip?>(null) }
     var randomTip by remember { mutableStateOf<Tip?>(null) }
+    var selectedCategory by remember(game) { mutableStateOf("Sve") }
+
+    val filteredTips =
+        if (selectedCategory == "Sve") {
+            tipViewModel.tips
+        } else {
+            tipViewModel.tips.filter { tip ->
+                tip.category == selectedCategory
+            }
+        }
 
     LaunchedEffect(game) {
         tipViewModel.loadTips(game)
@@ -79,7 +99,7 @@ fun TipScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Text(
             text = screenTitle,
@@ -90,18 +110,28 @@ fun TipScreen(
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = "Ukupno savjeta: ${tipViewModel.tips.size}",
+            text = "Prikazano: ${filteredTips.size} od ${tipViewModel.tips.size}",
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.tertiary
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.dp))
+
+        CategoryChips(
+            categories = listOf("Sve") + categories,
+            selectedCategory = selectedCategory,
+            onCategorySelected = { category ->
+                selectedCategory = category
+            }
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
 
         OutlinedButton(
             onClick = {
-                randomTip = tipViewModel.tips.random()
+                randomTip = filteredTips.random()
             },
-            enabled = tipViewModel.tips.isNotEmpty(),
+            enabled = filteredTips.isNotEmpty(),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
@@ -114,7 +144,7 @@ fun TipScreen(
             Text("✦ Prikaži nasumični savjet")
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         tipViewModel.errorMessage?.let { message ->
             Text(
@@ -130,17 +160,16 @@ fun TipScreen(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         } else if (tipViewModel.tips.isEmpty()) {
-            Text(
-                text = "Još nema savjeta.",
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.75f)
-            )
+            Text("Još nema savjeta.")
+        } else if (filteredTips.isEmpty()) {
+            Text("Nema savjeta u ovoj kategoriji.")
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(
-                    items = tipViewModel.tips,
+                    items = filteredTips,
                     key = { tip -> tip.id }
                 ) { tip ->
                     Card(
@@ -169,6 +198,16 @@ fun TipScreen(
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
+                            )
+
+                            Spacer(modifier = Modifier.height(4.dp))
+
+                            Text(
+                                text = tip.category.ifBlank {
+                                    "Bez kategorije"
+                                },
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.tertiary
                             )
 
                             Spacer(modifier = Modifier.height(8.dp))
@@ -217,15 +256,18 @@ fun TipScreen(
     if (showAddDialog) {
         TipDialog(
             dialogTitle = "Dodaj savjet",
+            categories = categories,
             initialTitle = "",
             initialDescription = "",
+            initialCategory = categories.first(),
             isLoading = tipViewModel.isLoading,
             errorMessage = tipViewModel.errorMessage,
-            onConfirm = { title, description ->
+            onConfirm = { title, description, category ->
                 tipViewModel.addTip(
                     title = title,
                     description = description,
-                    game = game
+                    game = game,
+                    category = category
                 ) {
                     showAddDialog = false
                 }
@@ -240,15 +282,18 @@ fun TipScreen(
     editingTip?.let { tip ->
         TipDialog(
             dialogTitle = "Uredi savjet",
+            categories = categories,
             initialTitle = tip.title,
             initialDescription = tip.description,
+            initialCategory = tip.category,
             isLoading = tipViewModel.isLoading,
             errorMessage = tipViewModel.errorMessage,
-            onConfirm = { title, description ->
+            onConfirm = { title, description, category ->
                 tipViewModel.updateTip(
                     tip = tip,
                     title = title,
-                    description = description
+                    description = description,
+                    category = category
                 ) {
                     editingTip = null
                 }
@@ -305,7 +350,18 @@ fun TipScreen(
                 Text(tip.title)
             },
             text = {
-                Text(tip.description)
+                Column {
+                    Text(
+                        text = tip.category.ifBlank {
+                            "Bez kategorije"
+                        },
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(tip.description)
+                }
             },
             confirmButton = {
                 TextButton(
@@ -323,11 +379,13 @@ fun TipScreen(
 @Composable
 private fun TipDialog(
     dialogTitle: String,
+    categories: List<String>,
     initialTitle: String,
     initialDescription: String,
+    initialCategory: String,
     isLoading: Boolean,
     errorMessage: String?,
-    onConfirm: (String, String) -> Unit,
+    onConfirm: (String, String, String) -> Unit,
     onDismiss: () -> Unit
 ) {
     var title by remember(initialTitle) {
@@ -336,6 +394,14 @@ private fun TipDialog(
 
     var description by remember(initialDescription) {
         mutableStateOf(initialDescription)
+    }
+
+    var category by remember(initialCategory) {
+        mutableStateOf(
+            initialCategory.ifBlank {
+                categories.first()
+            }
+        )
     }
 
     AlertDialog(
@@ -374,6 +440,23 @@ private fun TipDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = "Kategorija",
+                    style = MaterialTheme.typography.labelLarge
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                CategoryChips(
+                    categories = categories,
+                    selectedCategory = category,
+                    onCategorySelected = { selected ->
+                        category = selected
+                    }
+                )
+
                 errorMessage?.let { message ->
                     Spacer(modifier = Modifier.height(12.dp))
 
@@ -387,7 +470,7 @@ private fun TipDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    onConfirm(title, description)
+                    onConfirm(title, description, category)
                 },
                 enabled = !isLoading
             ) {
@@ -409,4 +492,28 @@ private fun TipDialog(
             }
         }
     )
+}
+
+@Composable
+private fun CategoryChips(
+    categories: List<String>,
+    selectedCategory: String,
+    onCategorySelected: (String) -> Unit
+) {
+    LazyRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(categories) { category ->
+            FilterChip(
+                selected = selectedCategory == category,
+                onClick = {
+                    onCategorySelected(category)
+                },
+                label = {
+                    Text(category)
+                }
+            )
+        }
+    }
 }

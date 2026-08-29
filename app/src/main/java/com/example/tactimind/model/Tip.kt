@@ -8,5 +8,6 @@ data class Tip(
     val description: String = "",
     val game: String = "",
     val authorId: String = "",
-    val createdAt: Timestamp = Timestamp.now()
+    val createdAt: Timestamp = Timestamp.now(),
+    val category: String = ""
 )

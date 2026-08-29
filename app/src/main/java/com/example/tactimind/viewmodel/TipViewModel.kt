@@ -35,6 +35,7 @@ class TipViewModel(
         title: String,
         description: String,
         game: String,
+        category: String,
         onSuccess: () -> Unit
     ) {
         errorMessage = null
@@ -44,12 +45,18 @@ class TipViewModel(
             return
         }
 
+        if (category.isBlank()) {
+            errorMessage = "Odaberi kategoriju."
+            return
+        }
+
         isLoading = true
 
         repository.addTip(
             title = title.trim(),
             description = description.trim(),
-            game = game
+            game = game,
+            category = category
         ) { success, message ->
             isLoading = false
 
@@ -66,6 +73,7 @@ class TipViewModel(
         tip: Tip,
         title: String,
         description: String,
+        category: String,
         onSuccess: () -> Unit
     ) {
         errorMessage = null
@@ -75,12 +83,18 @@ class TipViewModel(
             return
         }
 
+        if (category.isBlank()) {
+            errorMessage = "Odaberi kategoriju."
+            return
+        }
+
         isLoading = true
 
         repository.updateTip(
             tipId = tip.id,
             title = title.trim(),
-            description = description.trim()
+            description = description.trim(),
+            category = category
         ) { success, message ->
             isLoading = false
 

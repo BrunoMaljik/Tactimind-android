@@ -14,6 +14,7 @@ class TipRepository(
         title: String,
         description: String,
         game: String,
+        category: String,
         onResult: (Boolean, String?) -> Unit
     ) {
         val userId = auth.currentUser?.uid
@@ -30,6 +31,7 @@ class TipRepository(
             title = title,
             description = description,
             game = game,
+            category = category,
             authorId = userId
         )
 
@@ -76,12 +78,14 @@ class TipRepository(
         tipId: String,
         title: String,
         description: String,
+        category: String,
         onResult: (Boolean, String?) -> Unit
     ) {
         tipsCollection.document(tipId)
             .update(
                 mapOf(
                     "title" to title,
+                    "category" to category,
                     "description" to description
                 )
             )
